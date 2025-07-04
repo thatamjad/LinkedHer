@@ -1,0 +1,80 @@
+# Docker Compose for local development
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: linkedher-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: linkedher
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./backend/scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - linkedher-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-build
+    container_name: linkedher-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/linkedher?authSource=admin
+      - JWT_SECRET=development_jwt_secret_key_32_characters
+      - JWT_REFRESH_SECRET=development_refresh_secret_key_32_characters
+      - JWT_EXPIRY=1h
+      - JWT_REFRESH_EXPIRY=7d
+      - CLIENT_URL=http://localhost:3000
+      - VERIFICATION_WINDOW_DAYS=7
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+      - uploads_data:/app/backend/uploads
+    depends_on:
+      - mongodb
+    networks:
+      - linkedher-network
+    command: npm run dev
+
+  # Frontend React App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: linkedher-frontend
+    restart: unless-stopped
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - linkedher-network
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongodb_data:
+  uploads_data:
+
+networks:
+  linkedher-network:
+    driver: bridge

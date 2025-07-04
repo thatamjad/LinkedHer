@@ -83,6 +83,28 @@ This project follows the MERN stack architecture:
 
 This project is licensed under the ISC License.
 
+## Deployment
+
+For detailed deployment instructions using GitHub Student Developer Pack benefits, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+### Quick Deployment Options:
+- **Frontend**: Vercel, Netlify
+- **Backend**: Railway, Render, DigitalOcean App Platform  
+- **Database**: MongoDB Atlas
+- **Domain**: Namecheap (.me domain free with student pack)
+
+### Environment Variables Required:
+- See `.env.example` files in backend and frontend directories
+- Never commit actual .env files to version control
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## Acknowledgments
 
-- Phase-wise plan based on the Linker project requirements 
+- Phase-wise plan based on the Linker project requirements
