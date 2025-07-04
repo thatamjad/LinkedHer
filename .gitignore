@@ -5,6 +5,11 @@
 .env.test.local
 .env.production.local
 
+# Production environment files with real credentials
+*-env-production.txt
+railway-env-production.txt
+vercel-env-production.txt
+
 # Dependencies
 node_modules/
 npm-debug.log*
