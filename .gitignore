@@ -10,9 +10,10 @@
 railway-env-production.txt
 vercel-env-production.txt
 
-# Documentation files (exclude all .md files except README.md)
+# Documentation files (exclude all .md files except main README.md)
 *.md
 !README.md
+frontend/README.md
 
 # Dependencies
 node_modules/
