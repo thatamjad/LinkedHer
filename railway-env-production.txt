@@ -7,9 +7,9 @@ PORT=5000
 # Database (Replace with your MongoDB Atlas connection string)
 MONGODB_URI=mongodb+srv://linkedher-admin:YOUR_PASSWORD@linkedher-production.xxxxx.mongodb.net/linkedher?retryWrites=true&w=majority
 
-# JWT Secrets (Generate secure 32+ character strings)
-JWT_SECRET=production_jwt_secret_key_32_characters_minimum_secure_random_string
-JWT_REFRESH_SECRET=production_refresh_jwt_secret_key_32_characters_minimum_secure_random_string
+# JWT Secrets (Cryptographically secure - COPY THESE EXACT VALUES)
+JWT_SECRET=6748f4f8af963ca8fdb721b830ca25bbacf134ddcd2ce50ae2fbfaf7c12df9c82
+JWT_REFRESH_SECRET=7f35228cf2ca9df485c37f1d6199842297fdb1293801d8e5dac760396e179a4eb
 JWT_EXPIRY=1h
 JWT_REFRESH_EXPIRY=7d
 
