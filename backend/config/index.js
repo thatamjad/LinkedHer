@@ -2,11 +2,15 @@ require('dotenv').config();
 
 module.exports = {
   port: process.env.PORT || 5000,
-  mongoURI: process.env.MONGO_URI || 'mongodb://localhost:27017/linker',
+  mongoURI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/linkedher',
   jwtSecret: process.env.JWT_SECRET,
-  jwtExpiration: process.env.JWT_EXPIRATION || '7d',
-  verificationExpirationDays: process.env.VERIFICATION_EXPIRATION_DAYS || 7,
-  emailFrom: process.env.EMAIL_FROM || 'noreply@linker.com',
+  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+  jwtExpiration: process.env.JWT_EXPIRY || '1h',
+  jwtRefreshExpiration: process.env.JWT_REFRESH_EXPIRY || '7d',
+  verificationExpirationDays: process.env.VERIFICATION_WINDOW_DAYS || 7,
+  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+  nodeEnv: process.env.NODE_ENV || 'development',
+  emailFrom: process.env.EMAIL_FROM || 'noreply@linkedher.com',
   smtpConfig: {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT || 587,
