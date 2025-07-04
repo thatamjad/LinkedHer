@@ -36,12 +36,29 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Setup Socket.IO
+// Setup Socket.IO with production-ready configuration
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
-  }
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        process.env.CLIENT_URL,
+        'https://linkedher.vercel.app',
+        'https://linkedher-frontend.vercel.app'
+      ].filter(Boolean);
+      
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST']
+  },
+  transports: ['websocket', 'polling']
 });
 
 // Create uploads directory if it doesn't exist
@@ -70,11 +87,34 @@ if (!fs.existsSync(screenshotsDir)) {
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(morgan('dev')); // Logging
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // Logging
+
+// CORS configuration for production and development
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001', 
+      process.env.CLIENT_URL,
+      'https://linkedher.vercel.app',
+      'https://linkedher-frontend.vercel.app'
+    ].filter(Boolean);
+    
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-refresh-token']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Parse cookies

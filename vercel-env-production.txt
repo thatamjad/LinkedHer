@@ -1,0 +1,12 @@
+# Production Environment Variables for Vercel (Frontend)
+# Add these in your Vercel project settings → Environment Variables
+
+# API Configuration (Update with your Railway backend URL)
+REACT_APP_API_URL=https://your-railway-app-name.up.railway.app/api
+
+# Optional Feature Flags
+REACT_APP_ENABLE_ANALYTICS=true
+REACT_APP_ENABLE_SENTRY=false
+
+# Build Configuration
+GENERATE_SOURCEMAP=false
