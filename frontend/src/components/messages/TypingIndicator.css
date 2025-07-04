@@ -1,0 +1,77 @@
+/* Typing Indicator Styles */
+.typing-indicator {
+  display: flex;
+  align-items: flex-start;
+  margin: 0.5rem 0;
+  opacity: 0.8;
+}
+
+.typing-avatar {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e9ecef;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.typing-content {
+  background: white;
+  border-radius: 18px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e1e5e9;
+  max-width: 70%;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 0.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #6c757d;
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 400ms;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.typing-text {
+  font-size: 0.7rem;
+  color: #6c757d;
+  font-style: italic;
+}

@@ -1,0 +1,65 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+const UserSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  profilePicture: { type: String, default: '' },
+  headline: { type: String, default: '' },
+  professionalSummary: { type: String, default: '' },
+  skills: [{ type: String }],
+  experience: [{
+    title: String,
+    company: String,
+    location: String,
+    from: Date,
+    to: Date,
+    current: Boolean,
+    description: String
+  }],
+  education: [{
+    school: String,
+    degree: String,
+    fieldOfStudy: String,
+    from: Date,
+    to: Date,
+    current: Boolean,
+    description: String
+  }],
+  verificationStatus: {
+    type: String,
+    enum: ['UNVERIFIED', 'PENDING_REVIEW', 'VERIFIED', 'REJECTED', 'EXPIRED'],
+    default: 'UNVERIFIED'
+  },
+  accountCreationDate: { type: Date, default: Date.now },
+  verificationDeadline: { type: Date },
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
+// Password hashing middleware
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    
+    // Set verification deadline to 7 days from account creation
+    if (!this.verificationDeadline) {
+      this.verificationDeadline = new Date(this.accountCreationDate);
+      this.verificationDeadline.setDate(this.verificationDeadline.getDate() + 7);
+    }
+    
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare passwords
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+module.exports = mongoose.model('User', UserSchema); 

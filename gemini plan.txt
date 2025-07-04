@@ -1,0 +1,328 @@
+
+Okay, I will generate a detailed phase-wise implementation plan for your MERN stack web application. This plan will build upon the features and architecture described in the `outline.md` file, incorporating your requested changes.
+
+**Project Title:** "AuraConnect" (Suggesting a name that evokes a sense of community and distinct identity) - *You can, of course, choose any name you prefer.*
+
+**Overall Project Goal:** To create a secure, women-only MERN stack social media application with dual modes: a Professional Networking mode (text/image posts, verified identity) and an X-style Anonymous Mode (text/image/video posts, untraceable cryptographic personas). The platform will include robust user verification, a job board populated by web scraping, and a comprehensive reporting system.
+
+---
+
+## **MERN Stack Implementation Plan: AuraConnect**
+
+### **Phase 1: Foundation, Core Professional Features & Initial Verification Setup (Months 1-3)**
+
+**Primary Goal:** Establish the MERN stack infrastructure, implement robust user authentication, build core features for the Professional Mode (profiles, text/image posts), and lay the groundwork for the women-only verification system.
+
+**I. Project Setup & MERN Stack Initialization (Weeks 1-2)**
+    *   **Task 1.1: Environment Setup**
+        *   Install Node.js, npm/yarn, MongoDB, and Git.
+        *   Set up IDE (e.g., VS Code) with relevant extensions (ESLint, Prettier).
+    *   **Task 1.2: Backend (Express.js) Initialization**
+        *   Initialize Node.js project (`npm init`).
+        *   Install Express.js and core middleware (cors, body-parser, morgan).
+        *   Create basic folder structure: `/config`, `/controllers`, `/models`, `/routes`, `/middleware`, `/utils`.
+        *   Set up MongoDB connection using Mongoose.
+    *   **Task 1.3: Frontend (React.js) Initialization**
+        *   Create React app using `create-react-app` or Vite.
+        *   Install core libraries: `axios` (for API calls), `react-router-dom` (for navigation).
+        *   Set up basic folder structure: `/src/components`, `/src/pages`, `/src/services`, `/src/contexts`, `/src/utils`, `/src/assets`.
+        *   Implement basic UI layout (Header, Footer, Navigation).
+    *   **Task 1.4: Version Control**
+        *   Initialize Git repository.
+        *   Establish branching strategy (e.g., main, develop, feature branches).
+
+**II. User Authentication & Authorization (Weeks 3-5)**
+    *   **Task 2.1: User Model (MongoDB/Mongoose)**
+        *   Define `User` schema: `firstName`, `lastName`, `email`, `password` (hashed), `profilePicture`, `headline`, `professionalSummary`, `createdAt`, `updatedAt`, `verificationStatus` (Enum: `UNVERIFIED`, `PENDING_REVIEW`, `VERIFIED`, `REJECTED`, `EXPIRED`), `accountCreationDate`.
+    *   **Task 2.2: Backend Authentication Logic**
+        *   Implement user registration (with password hashing - bcrypt.js).
+        *   Implement user login (email/password, JWT generation).
+        *   Implement JWT-based authentication middleware to protect routes.
+        *   Implement basic password reset functionality (e.g., email link - can be enhanced later).
+    *   **Task 2.3: Frontend Authentication UI & Logic**
+        *   Create Registration and Login pages/components.
+        *   Implement API calls to backend auth endpoints.
+        *   Manage user session/token (e.g., Context API, Redux, Zustand).
+        *   Implement protected routes that require login.
+        *   Basic "Forgot Password" UI.
+
+**III. Professional Profile Management (Weeks 6-8)**
+    *   **Task 3.1: Enhance `User` Model for Professional Details**
+        *   Add fields: `experience` (array of objects: `title`, `company`, `dates`, `description`), `education` (array of objects: `institution`, `degree`, `dates`), `skills` (array of strings), `industry`, `portfolioLinks` (array of strings).
+    *   **Task 3.2: Backend CRUD APIs for Professional Profile**
+        *   Endpoints to create, read, update, and delete profile sections (experience, education, skills).
+    *   **Task 3.3: Frontend Profile View & Edit UI**
+        *   Create a `UserProfilePage` to display professional details.
+        *   Implement forms/components for users to edit their profile information.
+        *   Image upload functionality for profile picture (e.g., using Multer on backend, Cloudinary/S3 for storage).
+
+**IV. Professional Mode - Posting System (Text & Image Only) (Weeks 9-11)**
+    *   **Task 4.1: `ProfessionalPost` Model (MongoDB/Mongoose)**
+        *   Define schema: `userId` (ref: `User`), `content` (String, for text), `imageUrl` (String, optional), `postType` (Enum: `TEXT`, `IMAGE`), `visibility` (Enum: `PUBLIC`, `CONNECTIONS` - connections feature later), `likes` (array of `userIds`), `comments` (array of objects: `userId`, `text`, `timestamp`), `createdAt`.
+    *   **Task 4.2: Backend APIs for Professional Posts**
+        *   Endpoints for creating new posts (text, image upload).
+        *   Endpoints for fetching posts (e.g., for a user's feed, by user ID).
+        *   Endpoints for liking/unliking posts.
+        *   Endpoints for adding/deleting comments.
+    *   **Task 4.3: Frontend UI for Professional Posts**
+        *   Component for creating new posts (text input, image uploader).
+        *   Component for displaying individual posts.
+        *   Develop the main professional feed page.
+        *   Implement like and comment functionality.
+
+**V. Initial Verification System Setup (Week 12)**
+    *   **Task 5.1: `Verification` Model (MongoDB/Mongoose)**
+        *   Define schema as per `outline.md`: `userId`, `verificationType`, `verificationStatus`, `linkedinData` (placeholder fields), `professionalEmailData` (placeholder fields), `governmentIdData` (placeholder fields), `verificationScore`, `verificationDate`, `expirationDate`.
+    *   **Task 5.2: Backend Logic for 7-Day Verification Window**
+        *   Cron job or scheduled task to check `accountCreationDate` and `verificationStatus`.
+        *   Logic to update `verificationStatus` to `EXPIRED` if unverified after 7 days.
+        *   Middleware to restrict unverified users (read-only access, no posting/commenting) and to block expired accounts.
+    *   **Task 5.3: Frontend UI for Basic Verification Status**
+        *   Display verification status prominently to the user.
+        *   Show countdown/days remaining for verification.
+        *   Provide UI stubs/placeholders for "Verify with LinkedIn," "Verify with Professional Email."
+
+---
+
+### **Phase 2: Full Women-Only Verification & Anonymous Mode Scaffolding (Months 4-6)**
+
+**Primary Goal:** Implement the detailed LinkedIn-style verification for women, including actual API integrations. Set up the foundational elements for the Anonymous Mode, including persona generation (initial version) and mode switching.
+
+**I. LinkedIn-Style Verification Implementation (Weeks 13-16)**
+    *   **Task 6.1: LinkedIn OAuth 2.0 Integration**
+        *   Register app with LinkedIn Developer Portal to get API keys.
+        *   Backend: Implement OAuth 2.0 flow (redirect to LinkedIn, handle callback, get access token).
+        *   Backend: Use access token to fetch basic profile data from LinkedIn API (name, profile URL, headline, connections count, profile creation date - if available).
+    *   **Task 6.2: Verification Logic - LinkedIn**
+        *   Backend: Analyze fetched LinkedIn data against criteria (profile age, connection count, profile completeness, attempt to infer gender if possible through name analysis libraries or by requesting relevant scopes – be mindful of privacy and LinkedIn API terms).
+        *   Update `Verification` model with `linkedinData` and calculated score contribution.
+    *   **Task 6.3: Professional Email Verification**
+        *   Backend: Endpoint for user to submit professional email.
+        *   Send a verification link/code to the submitted email.
+        *   Verify email upon link click/code submission.
+        *   Backend: Attempt to check domain validity (e.g., against a list of known corporate domains or using a third-party API for domain reputation, if feasible).
+        *   Update `Verification` model with `professionalEmailData`.
+    *   **Task 6.4: Government ID Verification (Placeholder & Security Considerations)**
+        *   Frontend: UI for uploading Government ID (with clear disclaimers about data handling).
+        *   Backend: Securely receive and temporarily store the image. **Critical: Do NOT store ID images long-term.**
+        *   Backend: Implement placeholder for AI-powered OCR and gender extraction. For MVP, this might be a manual review flag.
+        *   Store only a hash of document details and gender verification status in `Verification` model, as per `outline.md`.
+        *   Implement strict data deletion policies for uploaded ID images after verification.
+    *   **Task 6.5: Overall Verification Score & Status Update**
+        *   Backend: Logic to calculate an overall `verificationScore` based on successful verifications.
+        *   Update `User.verificationStatus` to `VERIFIED` upon successful multi-factor verification.
+        *   Handle `PENDING_REVIEW` and `REJECTED` states.
+    *   **Task 6.6: Frontend Verification Workflow UI**
+        *   Detailed UI for each verification step (LinkedIn connect, email submission, ID upload).
+        *   Clear feedback to the user on status and next steps.
+
+**II. Anonymous Mode - Core Structure & Initial Persona (Weeks 17-20)**
+    *   **Task 7.1: `AnonymousProfile` Model (MongoDB/Mongoose)**
+        *   Define schema: `userId` (ref: `User` - for internal linking, not publicly traceable), `personaId` (unique, cryptographically generated string), `displayName` (randomly generated or user-chosen from suggestions), `avatar` (randomly generated/selectable), `createdAt`.
+    *   **Task 7.2: Backend - Basic Anonymous Persona Generation**
+        *   Endpoint for a verified user to generate their first anonymous persona.
+        *   Initially, `personaId` can be a strong UUID or a hash of user ID + salt (ensure it's not directly reversible).
+        *   Generate random display names and avatar placeholders.
+    *   **Task 7.3: `AnonymousPost` Model (MongoDB/Mongoose)**
+        *   Define schema: `personaId` (ref: `AnonymousProfile.personaId`), `content` (String), `imageUrl` (String, optional), `videoUrl` (String, optional), `postType` (Enum: `TEXT`, `IMAGE`, `VIDEO`), `likes` (array of `personaIds` - to prevent linking), `comments` (array of objects: `personaId`, `text`, `timestamp`), `createdAt`, `disappearsAt` (optional, for disappearing posts).
+    *   **Task 7.4: Frontend - Mode Switching UI**
+        *   Implement a clear UI toggle/button to switch between Professional and Anonymous modes.
+        *   Manage application state to reflect the current mode and display relevant UI/data.
+    *   **Task 7.5: Basic Anonymous Post Creation (UI & Backend Stubs)**
+        *   Frontend: Create UI for composing anonymous posts (text, image, video uploads).
+        *   Backend: Create placeholder API endpoints for anonymous post creation.
+
+**III. UI/UX Refinements for Women-Centric Design (Weeks 21-24)**
+    *   **Task 8.1: Theme and Styling**
+        *   Implement color palette (soft pastels, professional accents as per `outline.md`).
+        *   Focus on clean, uncluttered interfaces and intuitive navigation.
+        *   Ensure responsive design for mobile-first experience.
+    *   **Task 8.2: Accessibility Review**
+        *   Initial review for WCAG compliance (contrast, keyboard navigation, ARIA attributes).
+    *   **Task 8.3: Incorporate Women-Focused UI Elements**
+        *   Subtle design cues that align with the target audience.
+        *   Ensure typography and imagery are inclusive and empowering.
+
+---
+
+### **Phase 3: Full Anonymous Mode, Cryptographic Anonymity & Robust Reporting (Months 7-9)**
+
+**Primary Goal:** Implement advanced cryptographic anonymity for personas, full functionality for anonymous posting (including video), and the comprehensive dual-mode reporting system with initial AI moderation capabilities.
+
+**I. Advanced Cryptographic Anonymity for Personas (Weeks 25-28)**
+    *   **Task 9.1: True Anonymous Persona Generation**
+        *   Backend: Replace basic `personaId` generation.
+        *   Research and implement a suitable cryptographic scheme for generating untraceable `personaId`s (e.g., using libraries for elliptic curve cryptography to generate key pairs, `personaId` could be a hash of the public key).
+        *   Focus on ensuring no link between `userId` and `personaId` is exposed publicly or easily derivable.
+        *   Implement `createAnonymousPersona` logic from `outline.md` (conceptual, simplify if ZKP/ring signatures are too complex for MVP, focus on strong pseudonymity and unlinkability).
+    *   **Task 9.2: Persona Management**
+        *   Backend & Frontend: Allow users to generate multiple anonymous personas (up to a reasonable limit).
+        *   Backend & Frontend: Implement seamless switching between active anonymous personas.
+        *   Ensure content and interactions are strictly isolated per persona.
+    *   **Task 9.3: Session Isolation**
+        *   Backend & Frontend: Ensure anonymous mode sessions are cryptographically and logically distinct from professional mode sessions. Consider separate JWTs or session handling mechanisms if needed for anonymity.
+
+**II. Anonymous Mode - Full Posting Features (Text, Image, Video) (Weeks 29-31)**
+    *   **Task 10.1: Backend APIs for Anonymous Posts**
+        *   Full implementation of create, read, like, comment for anonymous posts.
+        *   Handle image and video uploads specifically for anonymous posts (consider metadata stripping).
+        *   Ensure `personaId` is used for all interactions, not `userId`.
+    *   **Task 10.2: Frontend UI for Anonymous Posts**
+        *   Full anonymous post composer (text, image, video).
+        *   Anonymous feed display.
+        *   Anonymous like/comment functionality.
+    *   **Task 10.3: (Optional based on priority) Disappearing Posts**
+        *   Backend: Logic to set `disappearsAt` timestamp. Cron job to delete expired posts.
+        *   Frontend: UI indication for disappearing posts.
+    *   **Task 10.4: (Optional based on priority) Anonymous Polling/Surveys**
+        *   Basic models and APIs for creating and participating in anonymous polls.
+
+**III. Robust Reporting System (Weeks 32-35)**
+    *   **Task 11.1: `ProfessionalReport` & `AnonymousReport` Models**
+        *   Implement schemas as detailed in `outline.md`.
+    *   **Task 11.2: Backend Reporting APIs**
+        *   Endpoints for submitting reports in both Professional and Anonymous modes.
+        *   Logic to handle different report types, evidence (screenshots, text).
+        *   System for moderators to review and action reports (status updates, resolution actions).
+    *   **Task 11.3: Frontend Reporting UI**
+        *   User-friendly interface for reporting posts or users/personas.
+        *   Ability to provide descriptions and upload evidence (if applicable).
+        *   Users can see the status of their submitted reports (optional for anonymous reports to maintain anonymity).
+    *   **Task 11.4: Initial AI-Powered Content Moderation (Rule-Based)**
+        *   Backend: Implement basic content analysis using keyword filtering for hate speech, harassment, PII (especially critical in anonymous mode).
+        *   Integrate `moderateContent` logic from `outline.md` (start with simpler rules, flag for manual review).
+        *   Automatically flag or hide content based on risk score pending moderator review.
+
+**IV. Safety & Security Enhancements (Week 36)**
+    *   **Task 12.1: Zero-Tolerance Harassment Policy Display**
+        *   Clearly display community guidelines and harassment policy.
+    *   **Task 12.2: Enhanced Privacy Controls (Professional Mode)**
+        *   Initial UI for users to control visibility of certain profile sections (e.g., public, connections only).
+    *   **Task 12.3: Metadata Stripping (Anonymous Uploads)**
+        *   Backend: Implement or use libraries to strip EXIF data and other metadata from images/videos uploaded in anonymous mode.
+
+---
+
+### **Phase 4: Job Section, Advanced Features & Refinements (Months 10-12)**
+
+**Primary Goal:** Implement the job scraping and matching functionality, introduce selected women-centric features, and conduct thorough testing and refinement of the entire application.
+
+**I. Job Section - Web Scraping & Display (Weeks 37-40)**
+    *   **Task 13.1: `Job` Model (MongoDB/Mongoose)**
+        *   Define schema: `title`, `companyName`, `location`, `description`, `jobUrl` (source URL), `source` (e.g., 'Indeed', 'LinkedIn'), `postedDate`, `isRemote`, `tags` (e.g., 'women-friendly', 'flexible'), `scrapedAt`.
+    *   **Task 13.2: Web Scraping Service (`JobScrapingService`)**
+        *   Backend: Develop scraping scripts for selected job boards (e.g., Indeed, LinkedIn Jobs, women-focused job sites like PowerToFly, FairyGodBoss).
+        *   Use libraries like Puppeteer (for dynamic sites) or Cheerio (for static sites).
+        *   Implement logic to handle different site structures, pagination, and error handling.
+        *   Set up a scheduler (e.g., node-cron) to run scrapers periodically.
+    *   **Task 13.3: Job Filtering & Women-Friendly Indicators**
+        *   Backend: Implement `filterForWomenFriendly` logic from `outline.md` (keyword-based filtering on job descriptions/company info).
+        *   Store filtered jobs in the database, ensure deduplication.
+    *   **Task 13.4: Frontend Job Board UI**
+        *   Page to display scraped job listings.
+        *   Search and filtering capabilities (by keyword, location, remote, women-friendly tags).
+        *   Link to original job postings.
+
+**II. Job Matching & Anonymous Interest (Weeks 41-43)**
+    *   **Task 14.1: Professional Mode Job Matching**
+        *   Backend: Implement `matchJobsToProfessional` logic. Compare user's skills, experience, industry from their professional profile with job requirements.
+        *   Frontend: Display matched jobs to users in their professional dashboard.
+    *   **Task 14.2: Anonymous Job Interest Tracking**
+        *   Backend: Implement `trackAnonymousJobInterest` logic. Allow anonymous personas to "bookmark" or express interest in jobs without revealing their professional identity.
+        *   Store this interest linked to `personaHash` and `jobHash`.
+        *   Frontend: UI for anonymous personas to track interested jobs.
+
+**III. Selected Women-Centric & Advanced Features (Weeks 44-46)**
+    *   **Task 15.1: Mentorship Matching (Basic)**
+        *   Backend: Basic algorithm to suggest mentors/mentees based on industry, skills, experience level.
+        *   Frontend: UI to opt-in for mentorship, view suggested matches.
+    *   **Task 15.2: Community/Support Group Stubs**
+        *   Backend: Basic models for `Group` and `GroupPost`.
+        *   Frontend: UI to list groups, view posts within a group (can be expanded later).
+    *   **Task 15.3: Two-Factor Authentication (2FA) for Professional Accounts**
+        *   Backend: Integrate a 2FA library (e.g., Speakeasy for TOTP).
+        *   Frontend: UI for users to set up and use 2FA.
+
+**IV. Testing, Refinement & Security Hardening (Weeks 47-48)**
+    *   **Task 16.1: Comprehensive Testing**
+        *   Unit tests for critical backend logic (auth, verification, anonymity).
+        *   Integration tests for API endpoints.
+        *   Frontend component testing.
+        *   End-to-end testing of key user flows (registration, verification, posting in both modes, job searching, reporting).
+    *   **Task 16.2: Security Review & Hardening**
+        *   Review against OWASP Top 10.
+        *   Focus on data protection for verification details and anonymity preservation.
+        *   Implement rate limiting, input validation, output encoding.
+    *   **Task 16.3: Performance Optimization**
+        *   Database query optimization (indexing).
+        *   API response time improvements.
+        *   Frontend bundle size reduction and rendering performance.
+
+---
+
+### **Phase 5: Beta Testing, Deployment & Launch Preparation (Months 13-14)**
+
+**Primary Goal:** Conduct beta testing with target users, prepare for production deployment, and finalize all launch materials.
+
+**I. Beta Testing Program (Weeks 49-52)**
+    *   **Task 17.1: Recruit Beta Testers**
+        *   Target professional women from diverse industries and backgrounds.
+    *   **Task 17.2: Conduct Beta Testing**
+        *   Provide testers with access to a staging environment.
+        *   Collect feedback on usability, features, bugs, safety perceptions.
+    *   **Task 17.3: Iterate Based on Feedback**
+        *   Prioritize and address critical bugs and usability issues identified during beta testing.
+
+**II. Production Deployment & Infrastructure (Weeks 53-56)**
+    *   **Task 18.1: Choose Hosting Platform**
+        *   Options: AWS (EC2, S3, RDS/DocumentDB), Heroku, DigitalOcean, Azure.
+        *   Consider needs for scalability, database management, file storage.
+    *   **Task 18.2: Production Environment Setup**
+        *   Configure production server, database, and file storage (e.g., S3 for images/videos).
+        *   Set up environment variables for production (API keys, database URIs).
+        *   Implement HTTPS using SSL/TLS certificates.
+    *   **Task 18.3: CI/CD Pipeline**
+        *   Set up Continuous Integration/Continuous Deployment (e.g., GitHub Actions, Jenkins, GitLab CI) for automated testing and deployment.
+    *   **Task 18.4: Monitoring & Logging**
+        *   Integrate tools for application performance monitoring (APM) and error logging (e.g., Sentry, New Relic, ELK stack).
+
+**III. Launch Preparation (Weeks 57-58)**
+    *   **Task 19.1: Final Security Audit**
+        *   Conduct a final security penetration test if budget allows, or a thorough internal review.
+    *   **Task 19.2: Legal & Privacy**
+        *   Finalize Terms of Service, Privacy Policy, Community Guidelines.
+        *   Ensure compliance with relevant data protection regulations (e.g., GDPR, CCPA, depending on target audience).
+    *   **Task 19.3: Onboarding Materials**
+        *   Create user guides, FAQs, and tutorials.
+    *   **Task 19.4: Marketing & Launch Plan**
+        *   Develop a strategy for announcing and launching the app.
+
+---
+
+### **Post-Launch & Future Enhancements (Ongoing)**
+
+*   **Monetization Strategy Implementation:**
+    *   Develop admin panels for managing premium features and company accounts.
+    *   Integrate payment gateways for premium subscriptions and job posting fees.
+*   **Advanced AI Moderation:**
+    *   Explore machine learning models for more nuanced content moderation.
+*   **Enhanced Women-Centric Features:**
+    *   Skill gap analysis tools.
+    *   Negotiation simulators.
+    *   Leadership development program tracking.
+    *   Virtual/in-person event integration.
+*   **Blockchain Integration for Anonymity (Advanced):**
+    *   If initial crypto solutions need strengthening, explore decentralized identity (DID) concepts or more robust ZKP implementations.
+    *   Cryptocurrency tipping (if aligned with platform goals).
+*   **Real-time Communication:**
+    *   Professional messaging.
+    *   Anonymous chat rooms.
+    *   Video call integration for mentorship.
+*   **Continuous Improvement:**
+    *   Gather user feedback and iterate on features.
+    *   Monitor performance and scale infrastructure as needed.
+    *   Stay updated on security best practices.
+
+---
+
+This detailed plan provides a roadmap for developing your MERN stack application. Remember that timelines are estimates and can be adjusted based on team size, complexity encountered, and evolving priorities. Good luck with your project!
