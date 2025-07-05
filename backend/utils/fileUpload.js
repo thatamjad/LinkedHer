@@ -1,17 +1,28 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 // Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '..', '..', 'uploads');
+// Use temp directory for cloud deployments where we can't write to /app
+const isCloudDeployment = process.env.NODE_ENV === 'production' && process.env.RAILWAY_ENVIRONMENT;
+const uploadDir = isCloudDeployment 
+  ? path.join(os.tmpdir(), 'uploads') 
+  : path.join(__dirname, '..', '..', 'uploads');
 const secureUploadDir = path.join(uploadDir, 'verification');
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+// Safely create directories with error handling
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
 
-if (!fs.existsSync(secureUploadDir)) {
-  fs.mkdirSync(secureUploadDir);
+  if (!fs.existsSync(secureUploadDir)) {
+    fs.mkdirSync(secureUploadDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn('Warning: Could not create upload directories:', error.message);
+  console.warn('Using temporary directory for file uploads');
 }
 
 // Set storage for verification documents

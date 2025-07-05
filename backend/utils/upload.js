@@ -1,15 +1,35 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
+
+// Helper function to safely create upload directories
+const createUploadDir = (dirPath) => {
+  try {
+    fs.mkdirSync(dirPath, { recursive: true });
+  } catch (error) {
+    console.warn(`Warning: Could not create upload directory ${dirPath}:`, error.message);
+    // Fall back to temp directory for cloud deployments
+    const tempDir = path.join(os.tmpdir(), 'uploads', path.basename(dirPath));
+    try {
+      fs.mkdirSync(tempDir, { recursive: true });
+      return tempDir;
+    } catch (tempError) {
+      console.error('Could not create temp directory:', tempError.message);
+      return os.tmpdir();
+    }
+  }
+  return dirPath;
+};
 
 // Storage configuration for profile images
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '../uploads/profiles');
-    fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
+    const finalPath = createUploadDir(uploadPath);
+    cb(null, finalPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${uuidv4()}`;
@@ -22,8 +42,8 @@ const profileStorage = multer.diskStorage({
 const postMediaStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '../uploads/media');
-    fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
+    const finalPath = createUploadDir(uploadPath);
+    cb(null, finalPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${uuidv4()}`;
